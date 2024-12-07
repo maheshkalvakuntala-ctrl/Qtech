@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopNest</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: scale(1.05);
+        }
+
+        .filters {
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-dark text-white py-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="h3">ShopNest</h1>
+            <form class="d-flex">
+                <input type="text" class="form-control me-2" placeholder="Search products..." id="searchBar">
+                <button type="button" class="btn btn-primary" id="searchButton">Search</button>
+            </form>
+        </div>
+    </header>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Filters Sidebar -->
+            <aside class="col-md-3">
+                <div class="filters border p-3 rounded">
+                    <h5>Filters</h5>
+                    <div class="mb-3">
+                        <label for="categoryFilter" class="form-label">Category</label>
+                        <select class="form-select" id="categoryFilter">
+                            <option value="all">All</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="home">Home</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="priceRange" class="form-label">Price Range</label>
+                        <input type="range" class="form-range" id="priceRange" min="0" max="500" step="10">
+                        <div class="d-flex justify-content-between">
+                            <span id="priceMin">$0</span>
+                            <span id="priceMax">$500</span>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary w-100" id="applyFilters">Apply Filters</button>
+                </div>
+            </aside>
+
+            <!-- Product Gallery -->
+            <main class="col-md-9">
+                <div class="row" id="productGallery">
+                    <!-- Sample Product Card -->
+                    <div class="col-md-4 mb-4">
+                        <div class="card product-card">
+                            <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/cases-covers/front-back-case/i/u/w/airpods-pro-2-tpu-purple-case-scalebee-original-imagu48chtxavap2.jpeg?q=90&crop=false" class="card-img-top" alt="Product Image">
+                            <div class="card-body">
+                                <h5 class="card-title">AirPods</h5>
+                                <p class="card-text">$99.99</p>
+                                <a href="#" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- More product cards can be dynamically added here -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white py-3 mt-4">
+        <div class="container text-center">
+            <p>&copy; 2024 ShopNest Inc. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const searchBar = document.getElementById('searchBar');
+        const searchButton = document.getElementById('searchButton');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const priceRange = document.getElementById('priceRange');
+        const priceMin = document.getElementById('priceMin');
+        const priceMax = document.getElementById('priceMax');
+        const applyFilters = document.getElementById('applyFilters');
+        const productGallery = document.getElementById('productGallery');
+
+        // Update price range display
+        priceRange.addEventListener('input', function () {
+            priceMax.textContent = `$${priceRange.value}`;
+        });
+
+        // Search functionality
+        searchButton.addEventListener('click', function () {
+            const query = searchBar.value.toLowerCase();
+            const productCards = productGallery.getElementsByClassName('product-card');
+
+            Array.from(productCards).forEach(card => {
+                const title = card.querySelector('.card-title').textContent.toLowerCase();
+                card.parentElement.style.display = title.includes(query) ? '' : 'none';
+            });
+        });
+
+        // Apply filters
+        applyFilters.addEventListener('click', function () {
+            const selectedCategory = categoryFilter.value;
+            const maxPrice = parseInt(priceRange.value, 10);
+            const productCards = productGallery.getElementsByClassName('product-card');
+
+            Array.from(productCards).forEach(card => {
+                const category = card.dataset.category;
+                const price = parseFloat(card.querySelector('.card-text').textContent.replace('$', ''));
+
+                const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
+                const matchesPrice = price <= maxPrice;
+
+                card.parentElement.style.display = matchesCategory && matchesPrice ? '' : 'none';
+            });
+        });
+
+        // Example to dynamically add products
+        const sampleProducts = [
+            { name: 'Smartphone', price: 299.99, category: 'electronics', image: 'https://tiimg.tistatic.com/fp/1/007/905/6-1-inches-screen-size-display-12-mp-front-camera-2815-mah-battery-6-gb-ram-apple-iphone-12-pro-mobile-phone-150.jpg' },
+            { name: 'Designer Jacket', price: 120.00, category: 'fashion', image: 'https://mobile.yoox.com/images/items/16/16261462UV_14_f.jpg?impolicy=crop&width=387&height=490' },
+            { name: 'Coffee Maker', price: 80.50, category: 'home', image: 'https://instamart-media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,h_600/NI_CATALOG/IMAGES/CIW/2024/8/13/afe4370e-27a9-4361-a3f3-a97570f52778_99108_1.png' },
+        ];
+
+        sampleProducts.forEach(product => {
+            const productCard = document.createElement('div');
+            productCard.className = 'col-md-4 mb-4';
+            productCard.innerHTML = `
+                <div class="card product-card" data-category="${product.category}">
+                    <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                    <div class="card-body">
+                        <h5 class="card-title">${product.name}</h5>
+                        <p class="card-text">$${product.price.toFixed(2)}</p>
+                        <a href="#" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            `;
+            productGallery.appendChild(productCard);
+        });
+    </script>
+</body>
+</html>
